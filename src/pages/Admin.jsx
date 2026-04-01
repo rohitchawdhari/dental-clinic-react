@@ -4,6 +4,8 @@ import Swal from "sweetalert2";
 
 const Admin = () => {
 
+const API_URL = "https://smile-dental-backend.onrender.com";
+
 const [appointments, setAppointments] = useState([]);
 const [loading, setLoading] = useState(true);
 
@@ -16,7 +18,7 @@ const fetchAppointments = async () => {
 
 try {
 
-const res = await fetch("http://localhost:5000/api/appointments");
+const res = await fetch(`${API_URL}/api/appointments`);
 const data = await res.json();
 
 setAppointments(data);
@@ -57,7 +59,7 @@ const confirm = window.confirm(
 
 if (!confirm) return;
 
-await fetch(`http://localhost:5000/api/appointments/${id}`, {
+await fetch(`${API_URL}/api/appointments/${id}`, {
 method: "DELETE",
 });
 
@@ -70,7 +72,7 @@ fetchAppointments();
 
 const updateStatus = async (item, status) => {
 
-await fetch(`http://localhost:5000/api/appointments/${item._id}`, {
+await fetch(`${API_URL}/api/appointments/${item._id}`, {
 method: "PUT",
 headers: {
 "Content-Type": "application/json",
