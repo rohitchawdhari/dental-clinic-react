@@ -1,15 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 
 const Admin = () => {
 
 const API_URL = "https://smile-dental-backend.onrender.com";
 
 const [appointments, setAppointments] = useState([]);
+const [selectedDate, setSelectedDate] = useState(new Date());
 const [loading, setLoading] = useState(true);
 
 const navigate = useNavigate();
+
+
+// Format Date
+
+const formatDate = (date) => {
+const d = new Date(date);
+return d.getFullYear() + "-" +
+String(d.getMonth() + 1).padStart(2, "0") + "-" +
+String(d.getDate()).padStart(2, "0");
+};
 
 
 // Fetch Appointments
@@ -80,7 +93,6 @@ headers: {
 body: JSON.stringify({ status }),
 });
 
-
 if (status === "Completed") {
 
 Swal.fire(
@@ -106,15 +118,22 @@ fetchAppointments();
 };
 
 
+// Filter by Date
+
+const filteredAppointments = appointments.filter(
+(item) => item.date === formatDate(selectedDate)
+);
+
+
 // Dashboard Counts
 
-const total = appointments.length;
+const total = filteredAppointments.length;
 
-const pending = appointments.filter(
+const pending = filteredAppointments.filter(
 (item) => item.status === "Pending"
 ).length;
 
-const completed = appointments.filter(
+const completed = filteredAppointments.filter(
 (item) => item.status === "Completed"
 ).length;
 
@@ -122,7 +141,6 @@ const completed = appointments.filter(
 return (
 
 <div className="min-h-screen bg-gray-100 p-6">
-
 
 <div className="flex justify-between items-center mb-6">
 
@@ -139,6 +157,41 @@ className="bg-red-500 text-white px-4 py-2 rounded"
 >
 Logout
 </button>
+
+</div>
+
+
+{/* Calendar */}
+
+<div className="bg-white p-6 rounded-lg shadow mb-6">
+
+<h2 className="text-xl font-bold mb-4">
+Appointment Calendar
+</h2>
+
+<style>
+{`
+.react-calendar__tile--now {
+background: transparent !important;
+color: inherit !important;
+}
+
+.react-calendar__tile--active {
+background: #3b82f6 !important;
+color: white !important;
+border-radius: 8px;
+}
+
+.react-calendar__tile {
+border-radius: 8px;
+}
+`}
+</style>
+
+<Calendar
+onChange={setSelectedDate}
+value={selectedDate}
+/>
 
 </div>
 
@@ -187,7 +240,7 @@ Logout
 
 <tbody>
 
-{appointments.map((item) => (
+{filteredAppointments.map((item) => (
 
 <tr key={item._id} className="border-b">
 

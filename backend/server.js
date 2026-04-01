@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 
-// Email Transporter
+// ================= EMAIL TRANSPORTER =================
 
 const transporter = nodemailer.createTransport({
 service: "gmail",
@@ -26,7 +26,7 @@ pass: process.env.EMAIL_PASS
 });
 
 
-// MongoDB Connect
+// ================= MONGODB CONNECT =================
 
 mongoose
 .connect(process.env.MONGO_URL)
@@ -41,6 +41,43 @@ res.send("Dental Backend Running");
 });
 
 
+// ================= ADMIN LOGIN =================
+
+app.post("/api/admin/login", async (req, res) => {
+
+try {
+
+const { username, password } = req.body;
+
+const ADMIN_USER = process.env.ADMIN_USER;
+const ADMIN_PASS = process.env.ADMIN_PASS;
+
+if (username === ADMIN_USER && password === ADMIN_PASS) {
+
+return res.json({
+success: true,
+message: "Login successful"
+});
+
+} else {
+
+return res.status(401).json({
+success: false,
+message: "Invalid credentials"
+});
+
+}
+
+} catch (error) {
+
+res.status(500).json({
+message: "Server error"
+});
+
+}
+
+});
+
 
 // ================= CREATE APPOINTMENT =================
 
@@ -50,8 +87,11 @@ try {
 
 const { name, phone, email, date, time, service } = req.body;
 
-
-// Prevent Duplicate Booking
+if (!name || !phone || !email || !date || !time) {
+return res.status(400).json({
+message: "Please fill all fields"
+});
+}
 
 const existing = await Appointment.findOne({
 date,
@@ -65,22 +105,17 @@ message: "Time already booked"
 });
 }
 
-
-// Create Appointment
-
 const appointment = new Appointment({
 name,
 phone,
 email,
 date,
 time,
-service
+service,
+status: "Pending"
 });
 
 await appointment.save();
-
-
-// Clinic Email
 
 await transporter.sendMail({
 
@@ -89,20 +124,14 @@ to: process.env.EMAIL_USER,
 subject: `New Appointment - ${name}`,
 
 html: `
-
 <h2>New Appointment Received</h2>
-
 <p><b>Patient Name:</b> ${name}</p>
 <p><b>Phone:</b> ${phone}</p>
 <p><b>Email:</b> ${email}</p>
 <p><b>Date:</b> ${date}</p>
 <p><b>Time:</b> ${time}</p>
 <p><b>Service:</b> ${service}</p>
-
-<p>Please contact patient for confirmation</p>
-
 `
-
 });
 
 res.status(201).json(appointment);
@@ -120,7 +149,6 @@ message: "Error saving appointment"
 });
 
 
-
 // ================= UPDATE STATUS =================
 
 app.put("/api/appointments/:id", async (req, res) => {
@@ -136,7 +164,7 @@ req.params.id,
 );
 
 
-// ========== APPROVED MAIL ==========
+// APPROVED MAIL
 
 if (status === "Completed") {
 
@@ -144,40 +172,13 @@ await transporter.sendMail({
 
 from: process.env.EMAIL_USER,
 to: appointment.email,
-subject: "Appointment Confirmed - Smile Dental Clinic",
+subject: "Appointment Confirmed",
 
 html: `
-
-<div style="font-family:Arial;background:#f5f7fb;padding:30px">
-
-<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
-
-<h2 style="color:#2a6edb">Smile Dental Clinic</h2>
-
-<p>Hello <b>${appointment.name}</b>,</p>
-
-<p>Your appointment has been successfully booked.</p>
-
-<div style="background:#f1f3f6;padding:15px;border-radius:6px">
-
-<p><b>Date:</b> ${appointment.date}</p>
-<p><b>Time:</b> ${appointment.time}</p>
-<p><b>Service:</b> ${appointment.service}</p>
-
-</div>
-
-<p>If you have any questions feel free to contact us.</p>
-
-<p>
-Smile Dental Clinic <br/>
-📞 +91 8467093427 <br/>
-✉ smiledentalofficial0@gmail.com
-</p>
-
-</div>
-
-</div>
-
+<h2>Appointment Confirmed</h2>
+<p>Date: ${appointment.date}</p>
+<p>Time: ${appointment.time}</p>
+<p>Service: ${appointment.service}</p>
 `
 
 });
@@ -185,8 +186,7 @@ Smile Dental Clinic <br/>
 }
 
 
-
-// ========== REJECT MAIL ==========
+// REJECT MAIL
 
 if (status === "Rejected") {
 
@@ -194,40 +194,11 @@ await transporter.sendMail({
 
 from: process.env.EMAIL_USER,
 to: appointment.email,
-subject: "Appointment Rejected - Smile Dental Clinic",
+subject: "Appointment Rejected",
 
 html: `
-
-<div style="font-family:Arial;background:#f5f7fb;padding:30px">
-
-<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
-
-<h2 style="color:#ff4d4d">Smile Dental Clinic</h2>
-
-<p>Hello <b>${appointment.name}</b>,</p>
-
-<p>Unfortunately your appointment has been rejected.</p>
-
-<div style="background:#f1f3f6;padding:15px;border-radius:6px">
-
-<p><b>Date:</b> ${appointment.date}</p>
-<p><b>Time:</b> ${appointment.time}</p>
-<p><b>Service:</b> ${appointment.service}</p>
-
-</div>
-
-<p>Please book another appointment.</p>
-
-<p>
-Smile Dental Clinic <br/>
-📞 +91 8467093427 <br/>
-✉ smiledentalofficial0@gmail.com
-</p>
-
-</div>
-
-</div>
-
+<h2>Appointment Rejected</h2>
+<p>Please book another time</p>
 `
 
 });
@@ -249,7 +220,6 @@ message: "Error updating status"
 });
 
 
-
 // ================= GET ALL =================
 
 app.get("/api/appointments", async (req, res) => {
@@ -263,7 +233,6 @@ res.json(appointments);
 });
 
 
-
 // ================= DELETE =================
 
 app.delete("/api/appointments/:id", async (req, res) => {
@@ -275,8 +244,7 @@ res.json({ message: "Deleted" });
 });
 
 
-
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
 console.log(`Server running on port ${PORT}`);
