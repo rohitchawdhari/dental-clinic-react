@@ -7,8 +7,9 @@ import { FaChevronRight } from "react-icons/fa";
 
 const BookAppointment = () => {
 
-const [activeStep, setActiveStep] = useState(1);
+const API_URL = "https://smile-dental-backend.onrender.com";
 
+const [activeStep, setActiveStep] = useState(1);
 const [loading, setLoading] = useState(false);
 
 const [formData, setFormData] = useState({
@@ -64,7 +65,7 @@ if (!formData.date) return;
 try {
 
 const res = await axios.get(
-"http://localhost:5000/api/appointments"
+`${API_URL}/api/appointments`
 );
 
 const filtered = res.data
@@ -113,7 +114,7 @@ return;
 setLoading(true);
 
 await axios.post(
-"http://localhost:5000/api/appointments",
+`${API_URL}/api/appointments`,
 formData
 );
 
