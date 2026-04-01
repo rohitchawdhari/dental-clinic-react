@@ -1,24 +1,19 @@
-import Header from "./components/Header";
-import Hero from "./components/Hero";
-import Services from "./components/Services";
-import About from "./components/About";
-import Tips from "./components/Tips";
-import BookAppointment from "./components/BookAppointment";
-import Testimonials from "./components/Testimonials";
-import Footer from "./components/Footer";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Home from "./pages/Home";
+import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin";
 
 function App() {
   return (
-    <>
-      <Header />
-      <Hero />
-      <Services />
-      <About />
-      <Tips />
-      <BookAppointment />
-      <Testimonials />
-      <Footer />
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+    </Router>
   );
 }
 

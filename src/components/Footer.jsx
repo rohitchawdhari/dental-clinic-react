@@ -1,225 +1,133 @@
-import { 
-FaInstagram, 
-FaPhone, 
-FaTelegram, 
-FaWhatsapp,
+import React from "react";
+import {
 FaTooth,
-FaRegClock,
-FaMapMarkedAlt
+FaPhone,
+FaEnvelope,
+FaMapMarkerAlt,
+FaFacebook,
+FaInstagram,
+FaWhatsapp
 } from "react-icons/fa";
-
-import { MdOutlineEmail } from "react-icons/md";
-
-const socialLinks = [
-{
-icon: <FaInstagram className="text-2xl" />,
-href: "#"
-},
-{
-icon: <FaWhatsapp className="text-2xl" />,
-href: "#"
-},
-{
-icon: <FaTelegram className="text-2xl" />,
-href: "#"
-}
-];
-
-const clinicHours = [
-{ day: "Sunday - Thursday", time: "9 AM - 5 PM" },
-{ day: "Friday", time: "4 AM - 9 PM" },
-{ day: "Saturday", time: "Closed" }
-];
-
-const contactInfo = [
-{
-icon: <FaPhone className="mr-4 text-white/70" />,
-text: (
-<a href="#" className="hover:text-sky-300 transition-colors">
-+1 (234) 567-89
-</a>
-)
-},
-
-{
-icon: <MdOutlineEmail className="mr-4 text-white/70" />,
-text: (
-<a href="#" className="hover:text-sky-300 transition-colors">
-info@brightsmile.com
-</a>
-)
-},
-
-{
-icon: <FaMapMarkedAlt className="mr-4 text-white/70" />,
-text: (
-<span>
-123 Dental Avenue, Health District, City
-</span>
-)
-}
-];
 
 const Footer = () => {
 return (
 
-<footer className="bg-gradient-to-b from-blue-950 to-blue-900 text-white pt-16 pb-12 relative overflow-hidden">
+<footer className="bg-gray-900 text-white pt-12 pb-6">
 
-<div className="container mx-auto px-6 relative z-10">
+<div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8">
 
-{/* Logo Section */}
+{/* Logo */}
 
-<div className="flex flex-col items-center mb-14">
-
-<div className="flex items-center mb-6">
-
-<div className="bg-white/20 p-3 rounded-full mr-4">
-<FaTooth className="text-2xl text-sky-300" />
-</div>
-
-<h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-300 to-blue-200">
-BrightSmile
+<div>
+<h2 className="text-2xl font-bold flex items-center gap-2">
+<FaTooth /> Smile Dental
 </h2>
 
+<p className="text-gray-400 mt-4">
+We provide quality dental care with modern technology and experienced dentists.
+</p>
 </div>
 
-{/* Social Links */}
 
-<div className="flex space-x-6 mb-8">
+{/* Quick Links */}
 
-{socialLinks.map((link, index) => (
-
-<a
-key={index}
-href={link.href}
-className="bg-white/10 hover:bg-white/20 p-3 rounded-full transition-all duration-300 hover:-translate-y-1"
->
-{link.icon}
-</a>
-
-))}
-
-</div>
-
-</div>
-
-{/* Grid */}
-
-<div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-
-{/* Clinic Hours */}
-
-<div className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 hover:border-sky-300 transition-colors">
-
-<h3 className="text-xl font-semibold mb-5 flex items-center">
-<FaRegClock className="mr-3 text-sky-300" />
-Clinic Hours
+<div>
+<h3 className="text-lg font-semibold mb-4">
+Quick Links
 </h3>
 
-<ul className="space-y-3">
-
-{clinicHours.map((item, index) => (
-
-<li
-key={index}
-className="flex justify-between text-white/70"
->
-<span>{item.day}</span>
-<span>{item.time}</span>
-</li>
-
-))}
-
-<li className="pt-3 mt-3 border-t border-white/10">
-Emergency services available 24/7
-</li>
-
+<ul className="space-y-2 text-gray-400">
+<li><a href="#home" className="hover:text-white">Home</a></li>
+<li><a href="#services" className="hover:text-white">Services</a></li>
+<li><a href="#about" className="hover:text-white">About</a></li>
+<li><a href="#book" className="hover:text-white">Book Appointment</a></li>
 </ul>
-
 </div>
+
 
 {/* Contact */}
 
-<div className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 hover:border-sky-300 transition-colors">
-
-<h3 className="text-xl font-semibold mb-5 flex items-center">
-<FaPhone className="mr-3 text-sky-300" />
-Contact Us
+<div>
+<h3 className="text-lg font-semibold mb-4">
+Contact
 </h3>
 
-<ul className="space-y-4">
+<ul className="space-y-3 text-gray-400">
 
-{contactInfo.map((item, index) => (
-
-<li key={index} className="flex items-start">
-{item.icon}
-{item.text}
+<li className="flex items-center gap-2">
+<FaPhone />
+<a href="tel:+919876543210" className="hover:text-white">
++91 8467093427
+</a>
 </li>
 
-))}
+<li className="flex items-center gap-2">
+<FaEnvelope />
+<a href="mailto:smiledentalofficial0@gmail.com" className="hover:text-white">
+smiledentalofficial0@gmail.com
+</a>
+</li>
+
+<li className="flex items-center gap-2">
+<FaMapMarkerAlt />
+<a
+href="https://maps.google.com"
+target="_blank"
+rel="noopener noreferrer"
+className="hover:text-white"
+>
+Your City, India
+</a>
+</li>
 
 </ul>
-
 </div>
 
-{/* Newsletter */}
 
-<div className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 hover:border-sky-300 transition-colors">
+{/* Social */}
 
-<h3 className="text-xl font-semibold mb-5">
-Dental Tips Newsletter
+<div>
+<h3 className="text-lg font-semibold mb-4">
+Follow Us
 </h3>
 
-<p className="text-white/70 mb-5">
-Subscribe to receive oral health tips and special offers
-</p>
+<div className="flex gap-4 text-xl">
 
-<div className="flex">
+<a
+href="https://facebook.com"
+target="_blank"
+className="hover:text-blue-500"
+>
+<FaFacebook />
+</a>
 
-<input
-type="email"
-placeholder="Your email address"
-className="bg-white/10 border border-white/20 text-white px-5 py-3 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-sky-300 w-full placeholder-white/50"
-/>
+<a
+href="https://instagram.com"
+target="_blank"
+className="hover:text-pink-500"
+>
+<FaInstagram />
+</a>
 
-<button className="bg-sky-500 hover:bg-sky-400 text-blue-900 font-medium px-5 py-3 rounded-r-lg transition-colors">
-Subscribe
-</button>
+<a
+href="https://wa.me/919876543210"
+target="_blank"
+className="hover:text-green-500"
+>
+<FaWhatsapp />
+</a>
 
 </div>
 
 </div>
 
 </div>
+
 
 {/* Bottom */}
 
-<div className="pt-8 flex flex-col md:flex-row justify-between items-center">
-
-<p className="text-white/50 text-sm mb-3 md:mb-0">
-© {new Date().getFullYear()} BrightSmile Dental Clinic. All rights reserved
-</p>
-
-<div className="flex space-x-6">
-
-<a
-href="#"
-className="text-white/50 hover:text-sky-300 text-sm transition-colors"
->
-Terms of Service
-</a>
-
-<a
-href="#"
-className="text-white/50 hover:text-sky-300 text-sm transition-colors"
->
-Privacy Policy
-</a>
-
-</div>
-
-</div>
-
+<div className="text-center text-gray-400 mt-10 border-t border-gray-700 pt-6">
+© 2025 Smile Dental Clinic. All rights reserved.
 </div>
 
 </footer>
