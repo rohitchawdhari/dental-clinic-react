@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 import Appointment from "./models/Appointment.js";
 
@@ -13,16 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-// ================= Nodemailer =================
-
-const transporter = nodemailer.createTransport({
-service: "gmail",
-auth: {
-user: process.env.EMAIL_USER,
-pass: process.env.EMAIL_PASS
-}
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 
 // MongoDB
@@ -58,11 +49,12 @@ status: "Pending"
 await appointment.save();
 
 
-// Admin Mail
+// Clinic Mail
 
-await transporter.sendMail({
+await resend.emails.send({
 
-from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
+from: "Smile Dental <onboarding@resend.dev>",
+
 to: process.env.EMAIL_USER,
 
 subject: `New Appointment - ${name}`,
@@ -124,9 +116,9 @@ req.params.id,
 
 if (status === "Completed") {
 
-await transporter.sendMail({
+await resend.emails.send({
 
-from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
+from: "Smile Dental <onboarding@resend.dev>",
 
 to: appointment.email,
 
@@ -167,9 +159,9 @@ console.log("Approve mail sent");
 
 if (status === "Rejected") {
 
-await transporter.sendMail({
+await resend.emails.send({
 
-from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
+from: "Smile Dental <onboarding@resend.dev>",
 
 to: appointment.email,
 
