@@ -108,6 +108,8 @@ try {
 
 const { status } = req.body;
 
+console.log("Status:", status);
+
 const appointment = await Appointment.findByIdAndUpdate(
 req.params.id,
 { status },
@@ -117,7 +119,7 @@ req.params.id,
 
 // ================= APPROVED MAIL =================
 
-if (status === "Approved" || status === "Completed") {
+if (status === "Completed") {
 
 await resend.emails.send({
 
@@ -154,6 +156,8 @@ html: `
 `
 
 });
+
+console.log("Approve mail sent");
 
 }
 
@@ -197,6 +201,8 @@ html: `
 `
 
 });
+
+console.log("Reject mail sent");
 
 }
 
