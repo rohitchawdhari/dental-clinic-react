@@ -117,7 +117,7 @@ req.params.id,
 
 // ================= APPROVED MAIL =================
 
-if (status === "Completed") {
+if (status === "Approved" || status === "Completed") {
 
 await resend.emails.send({
 
