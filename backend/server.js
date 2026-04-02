@@ -2,10 +2,9 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
 import Appointment from "./models/Appointment.js";
-import Review from "./models/reviewModel.js";
 
 dotenv.config();
 
@@ -15,18 +14,23 @@ app.use(cors());
 app.use(express.json());
 
 
-// ================= RESEND =================
+// ================= Nodemailer =================
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+service: "gmail",
+auth: {
+user: process.env.EMAIL_USER,
+pass: process.env.EMAIL_PASS
+}
+});
 
 
-// ================= MONGODB =================
+// MongoDB
 
 mongoose
 .connect(process.env.MONGO_URL)
 .then(() => console.log("MongoDB Connected"))
 .catch((err) => console.log(err));
-
 
 app.get("/", (req, res) => {
 res.send("Dental Backend Running");
@@ -54,20 +58,17 @@ status: "Pending"
 await appointment.save();
 
 
-// ================= ADMIN MAIL =================
+// Admin Mail
 
-await resend.emails.send({
+await transporter.sendMail({
 
-from: "Smile Dental <onboarding@resend.dev>",
-reply_to: "smiledentalofficial0@gmail.com",
-
+from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 to: process.env.EMAIL_USER,
 
 subject: `New Appointment - ${name}`,
 
 html: `
 <div style="font-family:Arial;background:#f5f7fb;padding:30px">
-
 <div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
 
 <h2 style="color:#2a6edb">New Appointment Received</h2>
@@ -84,7 +85,6 @@ html: `
 <p>Please contact the patient for confirmation.</p>
 
 </div>
-
 </div>
 `
 
@@ -94,7 +94,7 @@ res.json({ success: true });
 
 } catch (error) {
 
-console.log("Mail Error:", error);
+console.log("Booking Mail Error:", error);
 
 res.status(500).json({
 message: "Error"
@@ -113,8 +113,6 @@ try {
 
 const status = req.body.status;
 
-console.log("Status:", status);
-
 const appointment = await Appointment.findByIdAndUpdate(
 req.params.id,
 { status },
@@ -122,21 +120,19 @@ req.params.id,
 );
 
 
-// ================= APPROVED MAIL =================
+// ================= APPROVE =================
 
 if (status === "Completed") {
 
-await resend.emails.send({
+await transporter.sendMail({
 
-from: "Smile Dental <onboarding@resend.dev>",
-reply_to: "smiledentalofficial0@gmail.com",
+from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 
 to: appointment.email,
 
 subject: "Appointment Confirmed - Smile Dental Clinic",
 
 html: `
-
 <div style="font-family:Arial;background:#f5f7fb;padding:30px">
 
 <div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
@@ -155,16 +151,9 @@ html: `
 
 </div>
 
-<p>
-<b>Smile Dental Clinic</b><br/>
-📞 +91 8467093427 <br/>
-✉ smiledentalofficial0@gmail.com
-</p>
-
 </div>
 
 </div>
-
 `
 
 });
@@ -174,21 +163,19 @@ console.log("Approve mail sent");
 }
 
 
-// ================= REJECTED MAIL =================
+// ================= REJECT =================
 
 if (status === "Rejected") {
 
-await resend.emails.send({
+await transporter.sendMail({
 
-from: "Smile Dental <onboarding@resend.dev>",
-reply_to: "smiledentalofficial0@gmail.com",
+from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 
 to: appointment.email,
 
 subject: "Appointment Rejected - Smile Dental Clinic",
 
 html: `
-
 <div style="font-family:Arial;background:#f5f7fb;padding:30px">
 
 <div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
@@ -207,16 +194,9 @@ html: `
 
 </div>
 
-<p>
-<b>Smile Dental Clinic</b><br/>
-📞 +91 8467093427 <br/>
-✉ smiledentalofficial0@gmail.com
-</p>
-
 </div>
 
 </div>
-
 `
 
 });
