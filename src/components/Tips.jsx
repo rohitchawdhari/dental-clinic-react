@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   FaTooth,
   FaShieldAlt,
@@ -7,6 +7,8 @@ import {
 } from "react-icons/fa";
 
 const Tips = () => {
+
+const detailsRef = useRef(null);
 
 const tips = [
 {
@@ -43,7 +45,18 @@ icon: <FaSmile />
 
 const [active, setActive] = useState(0);
 
+const handleClick = (index) => {
+setActive(index);
+
+setTimeout(() => {
+detailsRef.current.scrollIntoView({
+behavior: "smooth"
+});
+}, 100);
+};
+
 return (
+
 <section id="tips" className="py-16 bg-gray-100">
 
 <div className="max-w-7xl mx-auto px-6">
@@ -57,14 +70,17 @@ Simple tips to keep your teeth healthy
 </p>
 
 <div className="grid md:grid-cols-5 gap-4 mb-8">
+
 {tips.map((tip, index) => (
+
 <div
 key={index}
-onClick={() => setActive(index)}
+onClick={() => handleClick(index)}
 className={`cursor-pointer p-4 rounded-xl text-center shadow 
 ${active === index ? "bg-blue-100 border-2 border-blue-500" : "bg-white"}
 `}
 >
+
 <div className="text-3xl mb-2 text-blue-500">
 {tip.icon}
 </div>
@@ -74,11 +90,17 @@ ${active === index ? "bg-blue-100 border-2 border-blue-500" : "bg-white"}
 </h3>
 
 </div>
+
 ))}
+
 </div>
 
 
-<div className="bg-blue-100 p-8 rounded-2xl shadow">
+<div
+ref={detailsRef}
+className="bg-blue-100 p-8 rounded-2xl shadow"
+>
+
 <h3 className="text-2xl font-bold mb-3">
 {tips[active].title}
 </h3>
@@ -92,6 +114,7 @@ ${active === index ? "bg-blue-100 border-2 border-blue-500" : "bg-white"}
 </div>
 
 </section>
+
 );
 };
 

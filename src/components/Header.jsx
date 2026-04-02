@@ -56,67 +56,34 @@ Smile Dental Clinic
 
 <nav className="space-x-6 hidden md:flex font-medium">
 
-<a href="#home"
-className={`${active==="home" ? "text-blue-600" : "text-gray-700"} hover:text-blue-600`}
->
-Home
-</a>
-
-<a href="#services"
-className={`${active==="services" ? "text-blue-600" : "text-gray-700"} hover:text-blue-600`}
->
-Services
-</a>
-
-<a href="#about"
-className={`${active==="about" ? "text-blue-600" : "text-gray-700"} hover:text-blue-600`}
->
-About
-</a>
-
-<a href="#tips"
-className={`${active==="tips" ? "text-blue-600" : "text-gray-700"} hover:text-blue-600`}
->
-Tips
-</a>
-
-<a href="#book"
-className={`${active==="book" ? "text-blue-600" : "text-gray-700"} hover:text-blue-600`}
->
-Book Appointment
-</a>
-
-<a href="#testimonials"
-className={`${active==="testimonials" ? "text-blue-600" : "text-gray-700"} hover:text-blue-600`}
->
-Testimonials
-</a>
+<a href="#home" className={`${active==="home" ? "text-blue-600" : ""}`}>Home</a>
+<a href="#services" className={`${active==="services" ? "text-blue-600" : ""}`}>Services</a>
+<a href="#about" className={`${active==="about" ? "text-blue-600" : ""}`}>About</a>
+<a href="#tips" className={`${active==="tips" ? "text-blue-600" : ""}`}>Tips</a>
+<a href="#book" className={`${active==="book" ? "text-blue-600" : ""}`}>Book</a>
+<a href="#testimonials" className={`${active==="testimonials" ? "text-blue-600" : ""}`}>Testimonials</a>
 
 </nav>
 
 
-{/* Right Buttons */}
+{/* Desktop Buttons */}
 
-<div className="hidden md:flex items-center gap-3">
+<div className="hidden md:flex gap-3">
 
-<Link
-to="/login"
-className="bg-gray-800 text-white px-4 py-2 rounded-lg"
->
+<Link to="/login"
+className="bg-gray-800 text-white px-4 py-2 rounded-lg">
 Admin Login
 </Link>
 
-<a
-href="#book"
-className="bg-blue-600 text-white px-4 py-2 rounded-lg"
->
+<a href="#book"
+className="bg-blue-600 text-white px-4 py-2 rounded-lg">
 Book Appointment
 </a>
 
 </div>
 
 
-{/* Mobile Menu Button */}
+{/* Mobile Button */}
 
 <div className="md:hidden text-2xl cursor-pointer">
 
@@ -129,6 +96,30 @@ Book Appointment
 </div>
 
 </div>
+
+
+{/* Mobile Menu */}
+
+{menuOpen && (
+<div className="md:hidden bg-white shadow-lg p-4 space-y-4">
+
+<a href="#home" onClick={()=>setMenuOpen(false)}>Home</a>
+<a href="#services" onClick={()=>setMenuOpen(false)}>Services</a>
+<a href="#about" onClick={()=>setMenuOpen(false)}>About</a>
+<a href="#tips" onClick={()=>setMenuOpen(false)}>Tips</a>
+<a href="#book" onClick={()=>setMenuOpen(false)}>Book</a>
+<a href="#testimonials" onClick={()=>setMenuOpen(false)}>Testimonials</a>
+
+<Link
+to="/login"
+onClick={()=>setMenuOpen(false)}
+className="block bg-gray-800 text-white px-4 py-2 rounded-lg"
+>
+Admin Login
+</Link>
+
+</div>
+)}
 
 </header>
 );
