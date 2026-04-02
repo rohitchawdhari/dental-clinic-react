@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 import Appointment from "./models/Appointment.js";
 import Review from "./models/reviewModel.js";
@@ -11,88 +11,22 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-origin: "*"
-}));
-
+app.use(cors());
 app.use(express.json());
 
+// ================= RESEND =================
 
-// ================= EMAIL TRANSPORTER (FIXED) =================
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const transporter = nodemailer.createTransport({
-host: "smtp.gmail.com",
-port: 587,
-secure: false,
-auth: {
-user: process.env.EMAIL_USER,
-pass: process.env.EMAIL_PASS
-}
-});
-
-
-// ================= SAFE MAIL FUNCTION =================
-
-const sendMail = async (mailOptions) => {
-try {
-await transporter.sendMail(mailOptions);
-console.log("Mail Sent");
-} catch (error) {
-console.log("Mail Error:", error);
-}
-};
-
-
-// ================= MONGODB CONNECT =================
+// ================= MONGODB =================
 
 mongoose
 .connect(process.env.MONGO_URL)
-.then(() => {
-console.log("MongoDB Connected");
-})
+.then(() => console.log("MongoDB Connected"))
 .catch((err) => console.log(err));
-
 
 app.get("/", (req, res) => {
 res.send("Dental Backend Running");
-});
-
-
-// ================= ADMIN LOGIN =================
-
-app.post("/api/admin/login", async (req, res) => {
-
-try {
-
-const { username, password } = req.body;
-
-const ADMIN_USER = process.env.ADMIN_USER;
-const ADMIN_PASS = process.env.ADMIN_PASS;
-
-if (username === ADMIN_USER && password === ADMIN_PASS) {
-
-return res.json({
-success: true,
-message: "Login successful"
-});
-
-} else {
-
-return res.status(401).json({
-success: false,
-message: "Invalid credentials"
-});
-
-}
-
-} catch (error) {
-
-res.status(500).json({
-message: "Server error"
-});
-
-}
-
 });
 
 
@@ -119,14 +53,14 @@ await appointment.save();
 
 // ================= ADMIN MAIL =================
 
-sendMail({
+await resend.emails.send({
 
-from: process.env.EMAIL_USER,
+from: "Smile Dental <onboarding@resend.dev>",
 to: process.env.EMAIL_USER,
+
 subject: `New Appointment - ${name}`,
 
 html: `
-
 <div style="font-family:Arial;background:#f5f7fb;padding:30px">
 
 <div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
@@ -147,22 +81,18 @@ html: `
 </div>
 
 </div>
-
 `
 
 });
 
-res.status(201).json({
-success: true,
-appointment
-});
+res.json({ success: true });
 
 } catch (error) {
 
-console.log(error);
+console.log("Mail Error:", error);
 
 res.status(500).json({
-message: "Error saving appointment"
+message: "Error"
 });
 
 }
@@ -185,14 +115,16 @@ req.params.id,
 );
 
 
-// ================= CONFIRM MAIL =================
+// ================= APPROVED MAIL =================
 
 if (status === "Completed") {
 
-sendMail({
+await resend.emails.send({
 
-from: process.env.EMAIL_USER,
+from: "Smile Dental <onboarding@resend.dev>",
+
 to: appointment.email,
+
 subject: "Appointment Confirmed - Smile Dental Clinic",
 
 html: `
@@ -201,7 +133,7 @@ html: `
 
 <div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
 
-<h2 style="color:#2a6edb">Smile Dental Clinic</h2>
+<h2 style="color:#2a9bd8">Smile Dental Clinic</h2>
 
 <p>Hello <b>${appointment.name}</b>,</p>
 
@@ -226,14 +158,16 @@ html: `
 }
 
 
-// ================= REJECT MAIL =================
+// ================= REJECTED MAIL =================
 
 if (status === "Rejected") {
 
-sendMail({
+await resend.emails.send({
 
-from: process.env.EMAIL_USER,
+from: "Smile Dental <onboarding@resend.dev>",
+
 to: appointment.email,
+
 subject: "Appointment Rejected - Smile Dental Clinic",
 
 html: `
@@ -273,7 +207,7 @@ res.json(appointment);
 console.log(error);
 
 res.status(500).json({
-message: "Error updating status"
+message: "Error"
 });
 
 }
@@ -281,15 +215,15 @@ message: "Error updating status"
 });
 
 
-// ================= GET ALL =================
+// ================= GET =================
 
 app.get("/api/appointments", async (req, res) => {
 
-const appointments = await Appointment.find().sort({
+const data = await Appointment.find().sort({
 createdAt: -1
 });
 
-res.json(appointments);
+res.json(data);
 
 });
 
