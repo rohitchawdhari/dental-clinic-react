@@ -61,6 +61,7 @@ subject: `New Appointment - ${name}`,
 
 html: `
 <div style="font-family:Arial;background:#f5f7fb;padding:30px">
+
 <div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
 
 <h2 style="color:#2a6edb">New Appointment Received</h2>
@@ -77,6 +78,7 @@ html: `
 <p>Please contact the patient for confirmation.</p>
 
 </div>
+
 </div>
 `
 
@@ -125,6 +127,7 @@ to: appointment.email,
 subject: "Appointment Confirmed - Smile Dental Clinic",
 
 html: `
+
 <div style="font-family:Arial;background:#f5f7fb;padding:30px">
 
 <div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
@@ -146,6 +149,7 @@ html: `
 </div>
 
 </div>
+
 `
 
 });
@@ -168,6 +172,7 @@ to: appointment.email,
 subject: "Appointment Rejected - Smile Dental Clinic",
 
 html: `
+
 <div style="font-family:Arial;background:#f5f7fb;padding:30px">
 
 <div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
@@ -178,17 +183,10 @@ html: `
 
 <p>Unfortunately your appointment has been rejected.</p>
 
-<div style="background:#f1f3f6;padding:15px;border-radius:6px">
-
-<p><b>Date:</b> ${appointment.date}</p>
-<p><b>Time:</b> ${appointment.time}</p>
-<p><b>Service:</b> ${appointment.service}</p>
-
 </div>
 
 </div>
 
-</div>
 `
 
 });
