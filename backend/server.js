@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
 import Appointment from "./models/Appointment.js";
 
@@ -13,10 +13,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+// ================= EMAIL SETUP =================
+
+const transporter = nodemailer.createTransport({
+
+service: "gmail",
+
+auth: {
+user: process.env.EMAIL_USER,
+pass: process.env.EMAIL_PASS,
+},
+
+});
 
 
-// MongoDB
+// ================= MONGODB =================
 
 mongoose
 .connect(process.env.MONGO_URL)
@@ -51,35 +63,25 @@ await appointment.save();
 
 // Clinic Mail
 
-await resend.emails.send({
+await transporter.sendMail({
 
-from: `Smile Dental <${process.env.EMAIL_USER}>`,
+from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 
 to: process.env.EMAIL_USER,
 
 subject: `New Appointment - ${name}`,
 
 html: `
-<div style="font-family:Arial;background:#f5f7fb;padding:30px">
 
-<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
+<h2>New Appointment Received</h2>
 
-<h2 style="color:#2a6edb">New Appointment Received</h2>
+<p>Name: ${name}</p>
+<p>Phone: ${phone}</p>
+<p>Email: ${email}</p>
+<p>Date: ${date}</p>
+<p>Time: ${time}</p>
+<p>Service: ${service}</p>
 
-<p><b>Patient Name:</b> ${name}</p>
-<p><b>Phone Number:</b> ${phone}</p>
-<p><b>Email:</b> ${email}</p>
-<p><b>Appointment Date:</b> ${date}</p>
-<p><b>Appointment Time:</b> ${time}</p>
-<p><b>Service:</b> ${service}</p>
-
-<hr/>
-
-<p>Please contact the patient for confirmation.</p>
-
-</div>
-
-</div>
 `
 
 });
@@ -114,84 +116,58 @@ req.params.id,
 );
 
 
-// ================= APPROVE =================
+// APPROVE
 
 if (status === "Completed") {
 
-await resend.emails.send({
+await transporter.sendMail({
 
-from: `Smile Dental <${process.env.EMAIL_USER}>`,
+from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 
 to: appointment.email,
 
-subject: "Appointment Confirmed - Smile Dental Clinic",
+subject: "Appointment Confirmed",
 
 html: `
 
-<div style="font-family:Arial;background:#f5f7fb;padding:30px">
+<h2>Appointment Confirmed</h2>
 
-<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
+<p>Hello ${appointment.name}</p>
 
-<h2 style="color:#2a9bd8">Smile Dental Clinic</h2>
-
-<p>Hello <b>${appointment.name}</b>,</p>
-
-<p>Your appointment has been successfully booked. Here are your details:</p>
-
-<div style="background:#f1f3f6;padding:15px;border-radius:6px">
-
-<p><b>Date:</b> ${appointment.date}</p>
-<p><b>Time:</b> ${appointment.time}</p>
-<p><b>Service:</b> ${appointment.service}</p>
-
-</div>
-
-</div>
-
-</div>
+<p>Date: ${appointment.date}</p>
+<p>Time: ${appointment.time}</p>
+<p>Service: ${appointment.service}</p>
 
 `
 
 });
-
-console.log("Approve mail sent");
 
 }
 
 
-// ================= REJECT =================
+// REJECT
 
 if (status === "Rejected") {
 
-await resend.emails.send({
+await transporter.sendMail({
 
-from: `Smile Dental <${process.env.EMAIL_USER}>`,
+from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 
 to: appointment.email,
 
-subject: "Appointment Rejected - Smile Dental Clinic",
+subject: "Appointment Rejected",
 
 html: `
 
-<div style="font-family:Arial;background:#f5f7fb;padding:30px">
+<h2>Appointment Rejected</h2>
 
-<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
+<p>Hello ${appointment.name}</p>
 
-<h2 style="color:#ff4d4d">Smile Dental Clinic</h2>
-
-<p>Hello <b>${appointment.name}</b>,</p>
-
-<p>Unfortunately your appointment has been rejected.</p>
-
-</div>
-
-</div>
+<p>Please book another slot</p>
 
 `
 
 });
-
-console.log("Reject mail sent");
 
 }
 
