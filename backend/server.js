@@ -14,9 +14,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
 // ================= RESEND =================
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
 
 // ================= MONGODB =================
 
@@ -24,6 +26,7 @@ mongoose
 .connect(process.env.MONGO_URL)
 .then(() => console.log("MongoDB Connected"))
 .catch((err) => console.log(err));
+
 
 app.get("/", (req, res) => {
 res.send("Dental Backend Running");
@@ -55,7 +58,9 @@ await appointment.save();
 
 await resend.emails.send({
 
-from: "Smile Dental <smiledentalofficial0@gmail.com>",
+from: "Smile Dental <onboarding@resend.dev>",
+reply_to: "smiledentalofficial0@gmail.com",
+
 to: process.env.EMAIL_USER,
 
 subject: `New Appointment - ${name}`,
@@ -112,7 +117,7 @@ console.log("Status:", status);
 
 const appointment = await Appointment.findByIdAndUpdate(
 req.params.id,
-{ status: status },
+{ status },
 { new: true }
 );
 
@@ -123,7 +128,8 @@ if (status === "Completed") {
 
 await resend.emails.send({
 
-from: "Smile Dental <smiledentalofficial0@gmail.com>",
+from: "Smile Dental <onboarding@resend.dev>",
+reply_to: "smiledentalofficial0@gmail.com",
 
 to: appointment.email,
 
@@ -174,7 +180,8 @@ if (status === "Rejected") {
 
 await resend.emails.send({
 
-from: "Smile Dental <smiledentalofficial0@gmail.com>",
+from: "Smile Dental <onboarding@resend.dev>",
+reply_to: "smiledentalofficial0@gmail.com",
 
 to: appointment.email,
 
