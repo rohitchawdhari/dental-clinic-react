@@ -72,7 +72,6 @@ to: process.env.EMAIL_USER,
 subject: `New Appointment - ${name}`,
 
 html: `
-
 <h2>New Appointment Received</h2>
 
 <p>Name: ${name}</p>
@@ -81,10 +80,11 @@ html: `
 <p>Date: ${date}</p>
 <p>Time: ${time}</p>
 <p>Service: ${service}</p>
-
 `
 
 });
+
+console.log("Booking mail sent");
 
 res.json({ success: true });
 
@@ -116,7 +116,7 @@ req.params.id,
 );
 
 
-// APPROVE
+// ================= APPROVE =================
 
 if (status === "Completed") {
 
@@ -126,10 +126,9 @@ from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 
 to: appointment.email,
 
-subject: "Appointment Confirmed",
+subject: "Appointment Confirmed - Smile Dental",
 
 html: `
-
 <h2>Appointment Confirmed</h2>
 
 <p>Hello ${appointment.name}</p>
@@ -138,14 +137,17 @@ html: `
 <p>Time: ${appointment.time}</p>
 <p>Service: ${appointment.service}</p>
 
+<p>Thank you for choosing Smile Dental</p>
 `
 
 });
 
+console.log("Approve mail sent");
+
 }
 
 
-// REJECT
+// ================= REJECT =================
 
 if (status === "Rejected") {
 
@@ -155,19 +157,19 @@ from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 
 to: appointment.email,
 
-subject: "Appointment Rejected",
+subject: "Appointment Rejected - Smile Dental",
 
 html: `
-
 <h2>Appointment Rejected</h2>
 
 <p>Hello ${appointment.name}</p>
 
 <p>Please book another slot</p>
-
 `
 
 });
+
+console.log("Reject mail sent");
 
 }
 
