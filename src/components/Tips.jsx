@@ -49,10 +49,21 @@ const handleClick = (index) => {
 setActive(index);
 
 setTimeout(() => {
-detailsRef.current.scrollIntoView({
+
+const yOffset = -120; // header height adjust
+const element = detailsRef.current;
+const y =
+element.getBoundingClientRect().top +
+window.pageYOffset +
+yOffset;
+
+window.scrollTo({
+top: y,
 behavior: "smooth"
 });
+
 }, 100);
+
 };
 
 return (
@@ -94,7 +105,6 @@ ${active === index ? "bg-blue-100 border-2 border-blue-500" : "bg-white"}
 ))}
 
 </div>
-
 
 <div
 ref={detailsRef}

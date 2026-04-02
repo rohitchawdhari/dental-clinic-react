@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Calendar from "react-calendar";
@@ -11,6 +11,9 @@ const API_URL = "https://smile-dental-backend.onrender.com";
 const [appointments, setAppointments] = useState([]);
 const [selectedDate, setSelectedDate] = useState(new Date());
 const [loading, setLoading] = useState(true);
+
+const audioRef = useRef(null);
+const lastIdRef = useRef(null);
 
 const navigate = useNavigate();
 
@@ -33,6 +36,26 @@ try {
 
 const res = await fetch(`${API_URL}/api/appointments`);
 const data = await res.json();
+
+if (data.length > 0) {
+
+const latestId = data[0]._id;
+
+if (lastIdRef.current && lastIdRef.current !== latestId) {
+
+audioRef.current.play();
+
+Swal.fire({
+title: "New Appointment 🔔",
+text: "New booking received",
+icon: "info"
+});
+
+}
+
+lastIdRef.current = latestId;
+
+}
 
 setAppointments(data);
 setLoading(false);
@@ -58,6 +81,12 @@ navigate("/login");
 }
 
 fetchAppointments();
+
+const interval = setInterval(() => {
+fetchAppointments();
+}, 10000);
+
+return () => clearInterval(interval);
 
 }, []);
 
@@ -142,6 +171,9 @@ return (
 
 <div className="min-h-screen bg-gray-100 p-6">
 
+<audio ref={audioRef} src="/notification.mp3" preload="auto" />
+
+
 <div className="flex justify-between items-center mb-6">
 
 <h1 className="text-3xl font-bold">
@@ -161,32 +193,11 @@ Logout
 </div>
 
 
-{/* Calendar */}
-
 <div className="bg-white p-6 rounded-lg shadow mb-6">
 
 <h2 className="text-xl font-bold mb-4">
 Appointment Calendar
 </h2>
-
-<style>
-{`
-.react-calendar__tile--now {
-background: transparent !important;
-color: inherit !important;
-}
-
-.react-calendar__tile--active {
-background: #3b82f6 !important;
-color: white !important;
-border-radius: 8px;
-}
-
-.react-calendar__tile {
-border-radius: 8px;
-}
-`}
-</style>
 
 <Calendar
 onChange={setSelectedDate}
@@ -195,8 +206,6 @@ value={selectedDate}
 
 </div>
 
-
-{/* Dashboard Cards */}
 
 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 
@@ -217,8 +226,6 @@ value={selectedDate}
 
 </div>
 
-
-{/* Table */}
 
 <div className="overflow-x-auto">
 

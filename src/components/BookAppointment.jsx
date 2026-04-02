@@ -100,8 +100,6 @@ Swal.fire("Error", "Please fill all fields", "error");
 return;
 }
 
-// Prevent Double Booking
-
 if (bookedTimes.includes(formData.time)) {
 Swal.fire({
 icon: "error",
@@ -119,6 +117,15 @@ formData
 );
 
 
+// Success Message
+
+Swal.fire(
+"Appointment Sent",
+"Clinic will confirm shortly",
+"success"
+);
+
+
 // WhatsApp Message
 
 const message = `🦷 New Appointment
@@ -132,15 +139,16 @@ Service: ${formData.service}
 
 Please confirm appointment`;
 
+
+setTimeout(() => {
+
 window.open(
-`https://wa.me/918467093427?text=${encodeURIComponent(message)}`
+`https://wa.me/918467093427?text=${encodeURIComponent(message)}`,
+"_blank"
 );
 
-Swal.fire({
-icon: "success",
-title: "Appointment Sent",
-text: "Clinic will confirm shortly"
-});
+}, 500);
+
 
 setFormData({
 name: "",
@@ -164,7 +172,9 @@ text: "Something went wrong"
 });
 
 } finally {
+
 setLoading(false);
+
 }
 
 };
@@ -192,6 +202,7 @@ Book your appointment with our expert dentists
 
 
 <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+
 
 {/* Step 1 */}
 
@@ -241,6 +252,7 @@ className="w-full p-4 border-2 border-gray-200 rounded-xl"
 </div>
 
 )}
+
 
 {/* Step 2 */}
 
@@ -305,6 +317,7 @@ className="w-full p-4 border-2 border-gray-200 rounded-xl"
 
 )}
 
+
 {/* Step 3 */}
 
 {activeStep === 3 && (
@@ -339,6 +352,7 @@ className="mt-6 w-full bg-sky-500 text-white py-4 rounded-xl font-bold"
 </div>
 
 )}
+
 
 {/* Navigation */}
 
