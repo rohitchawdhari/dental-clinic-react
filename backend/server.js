@@ -55,7 +55,7 @@ await appointment.save();
 
 await resend.emails.send({
 
-from: "Smile Dental <onboarding@resend.dev>",
+from: "Smile Dental <smiledentalofficial0@gmail.com>",
 to: process.env.EMAIL_USER,
 
 subject: `New Appointment - ${name}`,
@@ -106,13 +106,13 @@ app.put("/api/appointments/:id", async (req, res) => {
 
 try {
 
-const { status } = req.body;
+const status = req.body.status;
 
 console.log("Status:", status);
 
 const appointment = await Appointment.findByIdAndUpdate(
 req.params.id,
-{ status },
+{ status: status },
 { new: true }
 );
 
@@ -123,7 +123,7 @@ if (status === "Completed") {
 
 await resend.emails.send({
 
-from: "Smile Dental <onboarding@resend.dev>",
+from: "Smile Dental <smiledentalofficial0@gmail.com>",
 
 to: appointment.email,
 
@@ -149,6 +149,12 @@ html: `
 
 </div>
 
+<p>
+<b>Smile Dental Clinic</b><br/>
+📞 +91 8467093427 <br/>
+✉ smiledentalofficial0@gmail.com
+</p>
+
 </div>
 
 </div>
@@ -168,7 +174,7 @@ if (status === "Rejected") {
 
 await resend.emails.send({
 
-from: "Smile Dental <onboarding@resend.dev>",
+from: "Smile Dental <smiledentalofficial0@gmail.com>",
 
 to: appointment.email,
 
@@ -194,6 +200,12 @@ html: `
 
 </div>
 
+<p>
+<b>Smile Dental Clinic</b><br/>
+📞 +91 8467093427 <br/>
+✉ smiledentalofficial0@gmail.com
+</p>
+
 </div>
 
 </div>
@@ -210,7 +222,7 @@ res.json(appointment);
 
 } catch (error) {
 
-console.log(error);
+console.log("Update Error:", error);
 
 res.status(500).json({
 message: "Error"
