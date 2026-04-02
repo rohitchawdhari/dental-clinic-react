@@ -53,7 +53,7 @@ await appointment.save();
 
 await resend.emails.send({
 
-from: "Smile Dental <onboarding@resend.dev>",
+from: `Smile Dental <${process.env.EMAIL_USER}>`,
 
 to: process.env.EMAIL_USER,
 
@@ -118,7 +118,7 @@ if (status === "Completed") {
 
 await resend.emails.send({
 
-from: "Smile Dental <onboarding@resend.dev>",
+from: `Smile Dental <${process.env.EMAIL_USER}>`,
 
 to: appointment.email,
 
@@ -161,7 +161,7 @@ if (status === "Rejected") {
 
 await resend.emails.send({
 
-from: "Smile Dental <onboarding@resend.dev>",
+from: `Smile Dental <${process.env.EMAIL_USER}>`,
 
 to: appointment.email,
 
