@@ -11,19 +11,36 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+origin: "*"
+}));
+
 app.use(express.json());
 
 
-// ================= EMAIL TRANSPORTER =================
+// ================= EMAIL TRANSPORTER (FIXED) =================
 
 const transporter = nodemailer.createTransport({
-service: "gmail",
+host: "smtp.gmail.com",
+port: 587,
+secure: false,
 auth: {
 user: process.env.EMAIL_USER,
 pass: process.env.EMAIL_PASS
 }
 });
+
+
+// ================= SAFE MAIL FUNCTION =================
+
+const sendMail = async (mailOptions) => {
+try {
+await transporter.sendMail(mailOptions);
+console.log("Mail Sent");
+} catch (error) {
+console.log("Mail Error:", error);
+}
+};
 
 
 // ================= MONGODB CONNECT =================
@@ -87,24 +104,6 @@ try {
 
 const { name, phone, email, date, time, service } = req.body;
 
-if (!name || !phone || !email || !date || !time) {
-return res.status(400).json({
-message: "Please fill all fields"
-});
-}
-
-const existing = await Appointment.findOne({
-date,
-time,
-status: { $ne: "Rejected" }
-});
-
-if (existing) {
-return res.status(400).json({
-message: "Time already booked"
-});
-}
-
 const appointment = new Appointment({
 name,
 phone,
@@ -118,9 +117,9 @@ status: "Pending"
 await appointment.save();
 
 
-// ================= NEW APPOINTMENT EMAIL =================
+// ================= ADMIN MAIL =================
 
-await transporter.sendMail({
+sendMail({
 
 from: process.env.EMAIL_USER,
 to: process.env.EMAIL_USER,
@@ -153,7 +152,10 @@ html: `
 
 });
 
-res.status(201).json(appointment);
+res.status(201).json({
+success: true,
+appointment
+});
 
 } catch (error) {
 
@@ -183,11 +185,11 @@ req.params.id,
 );
 
 
-// ================= APPROVED MAIL =================
+// ================= CONFIRM MAIL =================
 
 if (status === "Completed") {
 
-await transporter.sendMail({
+sendMail({
 
 from: process.env.EMAIL_USER,
 to: appointment.email,
@@ -213,20 +215,6 @@ html: `
 
 </div>
 
-<p>If you have any questions, feel free to contact us.</p>
-
-<p>
-<b>Smile Dental Clinic</b><br/>
-📞 +91 8467093427 <br/>
-✉ smiledentalofficial0@gmail.com
-</p>
-
-<hr/>
-
-<p style="color:gray">
-Thank you for choosing Smile Dental Clinic
-</p>
-
 </div>
 
 </div>
@@ -238,11 +226,11 @@ Thank you for choosing Smile Dental Clinic
 }
 
 
-// ================= REJECTED MAIL =================
+// ================= REJECT MAIL =================
 
 if (status === "Rejected") {
 
-await transporter.sendMail({
+sendMail({
 
 from: process.env.EMAIL_USER,
 to: appointment.email,
@@ -267,14 +255,6 @@ html: `
 <p><b>Service:</b> ${appointment.service}</p>
 
 </div>
-
-<p>Please book another appointment.</p>
-
-<p>
-<b>Smile Dental Clinic</b><br/>
-📞 +91 8467093427 <br/>
-✉ smiledentalofficial0@gmail.com
-</p>
 
 </div>
 
