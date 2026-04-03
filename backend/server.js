@@ -6,6 +6,7 @@ import nodemailer from "nodemailer";
 
 import Appointment from "./models/Appointment.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import chatbotRoutes from "./routes/chatbot.js";
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ mongoose
 // REVIEW ROUTE
 
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/chat", chatbotRoutes);
 
 
 app.get("/", (req, res) => {
