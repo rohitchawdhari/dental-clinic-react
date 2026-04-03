@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 
 import Appointment from "./models/Appointment.js";
+import reviewRoutes from "./routes/reviewRoutes.js";   // NEW
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 
-// ================= EMAIL SETUP =================
+// EMAIL SETUP
 
 const transporter = nodemailer.createTransport({
 service: "gmail",
@@ -22,22 +23,30 @@ auth: {
 user: process.env.EMAIL_USER,
 pass: process.env.EMAIL_PASS,
 },
+tls: {
+rejectUnauthorized: false
+}
 });
 
 
-// ================= MONGODB =================
+// MONGODB
 
 mongoose
 .connect(process.env.MONGO_URL)
 .then(() => console.log("MongoDB Connected"))
 .catch((err) => console.log(err));
 
+
+// REVIEW ROUTE (NEW)
+app.use("/api/reviews", reviewRoutes);
+
+
 app.get("/", (req, res) => {
 res.send("Dental Backend Running");
 });
 
 
-// ================= CREATE APPOINTMENT =================
+// CREATE APPOINTMENT
 
 app.post("/api/appointments", async (req, res) => {
 
@@ -57,17 +66,12 @@ status: "Pending"
 
 await appointment.save();
 
-
-// 🔥 RESPONSE पहले भेजो
 res.json({ success: true });
 
-
-// 🔥 MAIL बाद में भेजो
-
-transporter.sendMail({
+await transporter.sendMail({
 
 from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
-to: process.env.EMAIL_USER,
+to: "smiledentalofficial0@gmail.com",
 
 subject: `New Appointment - ${name}`,
 
@@ -82,16 +86,13 @@ html: `
 <p>Service: ${service}</p>
 `
 
-}).then(()=>{
-console.log("Booking mail sent");
-}).catch(err=>{
-console.log("Booking mail error",err);
 });
 
+console.log("Booking mail sent");
 
 } catch (error) {
 
-console.log("Booking Error:", error);
+console.log("Booking Mail Error:", error);
 
 res.status(500).json({
 message: "Error"
@@ -102,7 +103,7 @@ message: "Error"
 });
 
 
-// ================= UPDATE STATUS =================
+// UPDATE STATUS
 
 app.put("/api/appointments/:id", async (req, res) => {
 
@@ -121,7 +122,7 @@ req.params.id,
 
 if (status === "Completed") {
 
-transporter.sendMail({
+await transporter.sendMail({
 
 from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 to: appointment.email,
@@ -136,9 +137,13 @@ html: `
 <p>Date: ${appointment.date}</p>
 <p>Time: ${appointment.time}</p>
 <p>Service: ${appointment.service}</p>
+
+<p>Thank you for choosing Smile Dental</p>
 `
 
 });
+
+console.log("Approve mail sent");
 
 }
 
@@ -147,12 +152,12 @@ html: `
 
 if (status === "Rejected") {
 
-transporter.sendMail({
+await transporter.sendMail({
 
 from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 to: appointment.email,
 
-subject: "Appointment Rejected",
+subject: "Appointment Rejected - Smile Dental",
 
 html: `
 <h2>Appointment Rejected</h2>
@@ -163,6 +168,8 @@ html: `
 `
 
 });
+
+console.log("Reject mail sent");
 
 }
 
@@ -181,7 +188,7 @@ message: "Error"
 });
 
 
-// ================= GET =================
+// GET
 
 app.get("/api/appointments", async (req, res) => {
 
@@ -194,7 +201,7 @@ res.json(data);
 });
 
 
-// ================= DELETE =================
+// DELETE
 
 app.delete("/api/appointments/:id", async (req, res) => {
 

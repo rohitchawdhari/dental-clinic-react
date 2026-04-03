@@ -116,17 +116,11 @@ await axios.post(
 formData
 );
 
-
-// Success Message
-
 Swal.fire(
 "Appointment Sent",
 "Clinic will confirm shortly",
 "success"
 );
-
-
-// WhatsApp Message
 
 const message = `🦷 New Appointment
 
@@ -139,16 +133,12 @@ Service: ${formData.service}
 
 Please confirm appointment`;
 
-
 setTimeout(() => {
-
 window.open(
 `https://wa.me/918467093427?text=${encodeURIComponent(message)}`,
 "_blank"
 );
-
 }, 500);
-
 
 setFormData({
 name: "",
@@ -203,9 +193,6 @@ Book your appointment with our expert dentists
 
 <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
 
-
-{/* Step 1 */}
-
 {activeStep === 1 && (
 
 <div className="p-8">
@@ -252,9 +239,6 @@ className="w-full p-4 border-2 border-gray-200 rounded-xl"
 </div>
 
 )}
-
-
-{/* Step 2 */}
 
 {activeStep === 2 && (
 
@@ -317,9 +301,6 @@ className="w-full p-4 border-2 border-gray-200 rounded-xl"
 
 )}
 
-
-{/* Step 3 */}
-
 {activeStep === 3 && (
 
 <div className="p-8">
@@ -352,9 +333,6 @@ className="mt-6 w-full bg-sky-500 text-white py-4 rounded-xl font-bold"
 </div>
 
 )}
-
-
-{/* Navigation */}
 
 <div className="px-8 pb-8 flex justify-between">
 

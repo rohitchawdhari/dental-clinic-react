@@ -16,7 +16,7 @@ message:""
 // Fetch Reviews
 
 const fetchReviews = async () => {
-const res = await fetch("http://localhost:5000/api/reviews");
+const res = await fetch("https://smile-dental-backend.onrender.com/api/reviews");
 const data = await res.json();
 setReviews(data);
 };
@@ -31,7 +31,12 @@ fetchReviews();
 const handleSubmit = async (e) => {
 e.preventDefault();
 
-await fetch("http://localhost:5000/api/reviews",{
+if(!formData.name || !formData.message){
+alert("Please fill all fields");
+return;
+}
+
+await fetch("https://smile-dental-backend.onrender.com/api/reviews",{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -127,7 +132,7 @@ onChange={(e)=>setFormData({...formData,name:e.target.value})}
 <select
 className="w-full p-3 border mb-4"
 value={formData.rating}
-onChange={(e)=>setFormData({...formData,rating:e.target.value})}
+onChange={(e)=>setFormData({...formData,rating:Number(e.target.value)})}
 >
 
 <option value="5">⭐⭐⭐⭐⭐</option>
