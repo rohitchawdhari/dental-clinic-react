@@ -17,14 +17,11 @@ app.use(express.json());
 // ================= EMAIL SETUP =================
 
 const transporter = nodemailer.createTransport({
-
 service: "gmail",
-
 auth: {
 user: process.env.EMAIL_USER,
 pass: process.env.EMAIL_PASS,
 },
-
 });
 
 
@@ -61,12 +58,15 @@ status: "Pending"
 await appointment.save();
 
 
-// Clinic Mail
+// 🔥 RESPONSE पहले भेजो
+res.json({ success: true });
 
-await transporter.sendMail({
+
+// 🔥 MAIL बाद में भेजो
+
+transporter.sendMail({
 
 from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
-
 to: process.env.EMAIL_USER,
 
 subject: `New Appointment - ${name}`,
@@ -82,15 +82,16 @@ html: `
 <p>Service: ${service}</p>
 `
 
+}).then(()=>{
+console.log("Booking mail sent");
+}).catch(err=>{
+console.log("Booking mail error",err);
 });
 
-console.log("Booking mail sent");
-
-res.json({ success: true });
 
 } catch (error) {
 
-console.log("Booking Mail Error:", error);
+console.log("Booking Error:", error);
 
 res.status(500).json({
 message: "Error"
@@ -116,14 +117,13 @@ req.params.id,
 );
 
 
-// ================= APPROVE =================
+// APPROVE
 
 if (status === "Completed") {
 
-await transporter.sendMail({
+transporter.sendMail({
 
 from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
-
 to: appointment.email,
 
 subject: "Appointment Confirmed - Smile Dental",
@@ -136,28 +136,23 @@ html: `
 <p>Date: ${appointment.date}</p>
 <p>Time: ${appointment.time}</p>
 <p>Service: ${appointment.service}</p>
-
-<p>Thank you for choosing Smile Dental</p>
 `
 
 });
 
-console.log("Approve mail sent");
-
 }
 
 
-// ================= REJECT =================
+// REJECT
 
 if (status === "Rejected") {
 
-await transporter.sendMail({
+transporter.sendMail({
 
 from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
-
 to: appointment.email,
 
-subject: "Appointment Rejected - Smile Dental",
+subject: "Appointment Rejected",
 
 html: `
 <h2>Appointment Rejected</h2>
@@ -168,8 +163,6 @@ html: `
 `
 
 });
-
-console.log("Reject mail sent");
 
 }
 
