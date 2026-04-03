@@ -67,22 +67,37 @@ status: "Pending"
 
 await appointment.save();
 
+
+// CLINIC MAIL
+
 await transporter.sendMail({
 
-from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
-to: "smiledentalofficial0@gmail.com",
+from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
+to: process.env.EMAIL_USER,
 
 subject: `New Appointment - ${name}`,
 
 html: `
-<h2>New Appointment Received</h2>
+<div style="font-family:Arial;background:#f5f7fb;padding:30px">
 
-<p>Name: ${name}</p>
-<p>Phone: ${phone}</p>
-<p>Email: ${email}</p>
-<p>Date: ${date}</p>
-<p>Time: ${time}</p>
-<p>Service: ${service}</p>
+<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
+
+<h2 style="color:#2a6edb">New Appointment Received</h2>
+
+<p><b>Patient Name:</b> ${name}</p>
+<p><b>Phone Number:</b> ${phone}</p>
+<p><b>Email:</b> ${email}</p>
+<p><b>Appointment Date:</b> ${date}</p>
+<p><b>Appointment Time:</b> ${time}</p>
+<p><b>Service:</b> ${service}</p>
+
+<hr/>
+
+<p>Please contact the patient for confirmation.</p>
+
+</div>
+
+</div>
 `
 
 });
@@ -125,21 +140,39 @@ if (status === "Completed") {
 
 await transporter.sendMail({
 
-from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
+from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
 to: appointment.email,
 
-subject: "Appointment Confirmed - Smile Dental",
+subject: "Appointment Confirmed - Smile Dental Clinic",
 
 html: `
-<h2>Appointment Confirmed</h2>
+<div style="font-family:Arial;background:#f5f7fb;padding:30px">
 
-<p>Hello ${appointment.name}</p>
+<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
 
-<p>Date: ${appointment.date}</p>
-<p>Time: ${appointment.time}</p>
-<p>Service: ${appointment.service}</p>
+<h2 style="color:#2a6edb">Smile Dental Clinic</h2>
 
-<p>Thank you for choosing Smile Dental</p>
+<p>Hello <b>${appointment.name}</b>,</p>
+
+<p>Your appointment has been successfully booked. Here are your details:</p>
+
+<div style="background:#f1f3f6;padding:15px;border-radius:6px">
+
+<p><b>Date:</b> ${appointment.date}</p>
+<p><b>Time:</b> ${appointment.time}</p>
+<p><b>Service:</b> ${appointment.service}</p>
+
+</div>
+
+<p>
+<b>Smile Dental Clinic</b><br/>
+📞 +91 8467093427 <br/>
+✉ smiledentalofficial0@gmail.com
+</p>
+
+</div>
+
+</div>
 `
 
 });
@@ -155,17 +188,39 @@ if (status === "Rejected") {
 
 await transporter.sendMail({
 
-from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
+from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
 to: appointment.email,
 
-subject: "Appointment Rejected - Smile Dental",
+subject: "Appointment Rejected - Smile Dental Clinic",
 
 html: `
-<h2>Appointment Rejected</h2>
+<div style="font-family:Arial;background:#f5f7fb;padding:30px">
 
-<p>Hello ${appointment.name}</p>
+<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
 
-<p>Please book another slot</p>
+<h2 style="color:#ff4d4d">Smile Dental Clinic</h2>
+
+<p>Hello <b>${appointment.name}</b>,</p>
+
+<p>Unfortunately your appointment has been rejected.</p>
+
+<div style="background:#f1f3f6;padding:15px;border-radius:6px">
+
+<p><b>Date:</b> ${appointment.date}</p>
+<p><b>Time:</b> ${appointment.time}</p>
+<p><b>Service:</b> ${appointment.service}</p>
+
+</div>
+
+<p>
+<b>Smile Dental Clinic</b><br/>
+📞 +91 8467093427 <br/>
+✉ smiledentalofficial0@gmail.com
+</p>
+
+</div>
+
+</div>
 `
 
 });
