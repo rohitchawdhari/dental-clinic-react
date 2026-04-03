@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 
 import Appointment from "./models/Appointment.js";
-import reviewRoutes from "./routes/reviewRoutes.js";   // NEW
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 dotenv.config();
 
@@ -37,7 +37,8 @@ mongoose
 .catch((err) => console.log(err));
 
 
-// REVIEW ROUTE (NEW)
+// REVIEW ROUTE
+
 app.use("/api/reviews", reviewRoutes);
 
 
@@ -66,8 +67,6 @@ status: "Pending"
 
 await appointment.save();
 
-res.json({ success: true });
-
 await transporter.sendMail({
 
 from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
@@ -90,11 +89,13 @@ html: `
 
 console.log("Booking mail sent");
 
+return res.json({ success: true });
+
 } catch (error) {
 
 console.log("Booking Mail Error:", error);
 
-res.status(500).json({
+return res.status(500).json({
 message: "Error"
 });
 
@@ -173,13 +174,13 @@ console.log("Reject mail sent");
 
 }
 
-res.json(appointment);
+return res.json(appointment);
 
 } catch (error) {
 
 console.log("Update Error:", error);
 
-res.status(500).json({
+return res.status(500).json({
 message: "Error"
 });
 
