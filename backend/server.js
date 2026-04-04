@@ -15,10 +15,12 @@ app.use(cors());
 app.use(express.json());
 
 
-// EMAIL SETUP
+// EMAIL SETUP (FIXED FOR RENDER)
 
 const transporter = nodemailer.createTransport({
-service: "gmail",
+host: "smtp.gmail.com",
+port: 587,
+secure: false,
 auth: {
 user: process.env.EMAIL_USER,
 pass: process.env.EMAIL_PASS,
@@ -155,13 +157,39 @@ to: appointment.email,
 subject: "Appointment Confirmed - Smile Dental Clinic",
 
 html: `
-<h2>Smile Dental Clinic</h2>
-<p>Hello ${appointment.name}</p>
-<p>Your appointment confirmed</p>
+<div style="font-family:Arial;background:#f5f7fb;padding:30px">
+
+<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
+
+<h2 style="color:#2a6edb">Smile Dental Clinic</h2>
+
+<p>Hello <b>${appointment.name}</b>,</p>
+
+<p>Your appointment has been successfully booked. Here are your details:</p>
+
+<div style="background:#f1f3f6;padding:15px;border-radius:6px">
+
+<p><b>Date:</b> ${appointment.date}</p>
+<p><b>Time:</b> ${appointment.time}</p>
+<p><b>Service:</b> ${appointment.service}</p>
+
+</div>
+
+<p>
+<b>Smile Dental Clinic</b><br/>
+📞 +91 8467093427 <br/>
+✉ smiledentalofficial0@gmail.com
+</p>
+
+</div>
+
+</div>
 `
 
 }).then(() => {
 console.log("Approve mail sent");
+}).catch(err => {
+console.log("Approve Mail Error:", err);
 });
 
 }
@@ -176,16 +204,42 @@ transporter.sendMail({
 from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
 to: appointment.email,
 
-subject: "Appointment Rejected",
+subject: "Appointment Rejected - Smile Dental Clinic",
 
 html: `
-<h2>Smile Dental Clinic</h2>
-<p>Hello ${appointment.name}</p>
-<p>Your appointment rejected</p>
+<div style="font-family:Arial;background:#f5f7fb;padding:30px">
+
+<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
+
+<h2 style="color:#ff4d4d">Smile Dental Clinic</h2>
+
+<p>Hello <b>${appointment.name}</b>,</p>
+
+<p>Unfortunately your appointment has been rejected.</p>
+
+<div style="background:#f1f3f6;padding:15px;border-radius:6px">
+
+<p><b>Date:</b> ${appointment.date}</p>
+<p><b>Time:</b> ${appointment.time}</p>
+<p><b>Service:</b> ${appointment.service}</p>
+
+</div>
+
+<p>
+<b>Smile Dental Clinic</b><br/>
+📞 +91 8467093427 <br/>
+✉ smiledentalofficial0@gmail.com
+</p>
+
+</div>
+
+</div>
 `
 
 }).then(() => {
 console.log("Reject mail sent");
+}).catch(err => {
+console.log("Reject Mail Error:", err);
 });
 
 }
