@@ -110,17 +110,23 @@ fetchAppointments();
 };
 
 
-// Update Status
+// Update Status (FIXED)
 
 const updateStatus = async (item, status) => {
 
-await fetch(`${API_URL}/api/appointments/${item._id}`, {
+try {
+
+const res = await fetch(`${API_URL}/api/appointments/${item._id}`, {
 method: "PUT",
 headers: {
 "Content-Type": "application/json",
 },
 body: JSON.stringify({ status }),
 });
+
+if (!res.ok) {
+throw new Error("Failed");
+}
 
 if (status === "Completed") {
 
@@ -143,6 +149,18 @@ Swal.fire(
 }
 
 fetchAppointments();
+
+} catch (error) {
+
+console.error(error);
+
+Swal.fire(
+"Error",
+"Something went wrong",
+"error"
+);
+
+}
 
 };
 
