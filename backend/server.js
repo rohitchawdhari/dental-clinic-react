@@ -6,7 +6,6 @@ import nodemailer from "nodemailer";
 
 import Appointment from "./models/Appointment.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
-import chatbotRoutes from "./routes/chatbot.js";
 
 dotenv.config();
 
@@ -41,8 +40,9 @@ mongoose
 // REVIEW ROUTE
 
 app.use("/api/reviews", reviewRoutes);
-app.use("/api/chat", chatbotRoutes);
 
+
+// HOME ROUTE
 
 app.get("/", (req, res) => {
 res.send("Dental Backend Running");
@@ -246,7 +246,7 @@ message: "Error"
 });
 
 
-// GET
+// GET APPOINTMENTS
 
 app.get("/api/appointments", async (req, res) => {
 
@@ -259,7 +259,7 @@ res.json(data);
 });
 
 
-// DELETE
+// DELETE APPOINTMENT
 
 app.delete("/api/appointments/:id", async (req, res) => {
 
