@@ -70,9 +70,14 @@ status: "Pending"
 await appointment.save();
 
 
-// CLINIC MAIL
+// RESPONSE FIRST
 
-await transporter.sendMail({
+res.json({ success: true });
+
+
+// MAIL BACKGROUND
+
+transporter.sendMail({
 
 from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
 to: process.env.EMAIL_USER,
@@ -102,15 +107,15 @@ html: `
 </div>
 `
 
-});
-
+}).then(() => {
 console.log("Booking mail sent");
-
-return res.json({ success: true });
+}).catch(err => {
+console.log("Booking Mail Error:", err);
+});
 
 } catch (error) {
 
-console.log("Booking Mail Error:", error);
+console.log("Booking Error:", error);
 
 return res.status(500).json({
 message: "Error"
@@ -135,12 +140,14 @@ req.params.id,
 { new: true }
 );
 
+res.json(appointment);
+
 
 // APPROVE
 
 if (status === "Completed") {
 
-await transporter.sendMail({
+transporter.sendMail({
 
 from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
 to: appointment.email,
@@ -148,38 +155,14 @@ to: appointment.email,
 subject: "Appointment Confirmed - Smile Dental Clinic",
 
 html: `
-<div style="font-family:Arial;background:#f5f7fb;padding:30px">
-
-<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
-
-<h2 style="color:#2a6edb">Smile Dental Clinic</h2>
-
-<p>Hello <b>${appointment.name}</b>,</p>
-
-<p>Your appointment has been successfully booked. Here are your details:</p>
-
-<div style="background:#f1f3f6;padding:15px;border-radius:6px">
-
-<p><b>Date:</b> ${appointment.date}</p>
-<p><b>Time:</b> ${appointment.time}</p>
-<p><b>Service:</b> ${appointment.service}</p>
-
-</div>
-
-<p>
-<b>Smile Dental Clinic</b><br/>
-📞 +91 8467093427 <br/>
-✉ smiledentalofficial0@gmail.com
-</p>
-
-</div>
-
-</div>
+<h2>Smile Dental Clinic</h2>
+<p>Hello ${appointment.name}</p>
+<p>Your appointment confirmed</p>
 `
 
-});
-
+}).then(() => {
 console.log("Approve mail sent");
+});
 
 }
 
@@ -188,50 +171,24 @@ console.log("Approve mail sent");
 
 if (status === "Rejected") {
 
-await transporter.sendMail({
+transporter.sendMail({
 
 from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
 to: appointment.email,
 
-subject: "Appointment Rejected - Smile Dental Clinic",
+subject: "Appointment Rejected",
 
 html: `
-<div style="font-family:Arial;background:#f5f7fb;padding:30px">
-
-<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
-
-<h2 style="color:#ff4d4d">Smile Dental Clinic</h2>
-
-<p>Hello <b>${appointment.name}</b>,</p>
-
-<p>Unfortunately your appointment has been rejected.</p>
-
-<div style="background:#f1f3f6;padding:15px;border-radius:6px">
-
-<p><b>Date:</b> ${appointment.date}</p>
-<p><b>Time:</b> ${appointment.time}</p>
-<p><b>Service:</b> ${appointment.service}</p>
-
-</div>
-
-<p>
-<b>Smile Dental Clinic</b><br/>
-📞 +91 8467093427 <br/>
-✉ smiledentalofficial0@gmail.com
-</p>
-
-</div>
-
-</div>
+<h2>Smile Dental Clinic</h2>
+<p>Hello ${appointment.name}</p>
+<p>Your appointment rejected</p>
 `
 
+}).then(() => {
+console.log("Reject mail sent");
 });
 
-console.log("Reject mail sent");
-
 }
-
-return res.json(appointment);
 
 } catch (error) {
 
@@ -259,7 +216,7 @@ res.json(data);
 });
 
 
-// DELETE APPOINTMENT
+// DELETE
 
 app.delete("/api/appointments/:id", async (req, res) => {
 
