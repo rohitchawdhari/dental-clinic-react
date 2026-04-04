@@ -15,17 +15,16 @@ app.use(cors());
 app.use(express.json());
 
 
-// EMAIL SETUP
+// EMAIL SETUP (FIXED FOR RENDER)
 
 const transporter = nodemailer.createTransport({
-service: "gmail",
+host: "smtp.gmail.com",
+port: 587,
+secure: false,
 auth: {
 user: process.env.EMAIL_USER,
 pass: process.env.EMAIL_PASS,
 },
-tls: {
-rejectUnauthorized: false
-}
 });
 
 
@@ -47,7 +46,7 @@ res.send("Dental Backend Running");
 });
 
 
-// ================= CREATE APPOINTMENT =================
+// CREATE APPOINTMENT
 
 app.post("/api/appointments", async (req, res) => {
 
@@ -67,22 +66,18 @@ status: "Pending"
 
 await appointment.save();
 
-
-// CLINIC MAIL
-
 await transporter.sendMail({
 
-from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
-to: process.env.EMAIL_USER,
+from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
+to: "smiledentalofficial0@gmail.com",
 
 subject: `New Appointment - ${name}`,
 
 html: `
-<div style="font-family:Arial;background:#f5f7fb;padding:30px">
+<div style="font-family: Arial; padding:20px; background:#f4f4f4">
+<div style="background:white; padding:20px; border-radius:8px">
 
-<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
-
-<h2 style="color:#2a6edb">New Appointment Received</h2>
+<h2 style="color:#2563eb">New Appointment Received</h2>
 
 <p><b>Patient Name:</b> ${name}</p>
 <p><b>Phone Number:</b> ${phone}</p>
@@ -93,10 +88,9 @@ html: `
 
 <hr/>
 
-<p>Please contact the patient for confirmation.</p>
+<p>Smile Dental Clinic</p>
 
 </div>
-
 </div>
 `
 
@@ -119,7 +113,7 @@ message: "Error"
 });
 
 
-// ================= UPDATE STATUS =================
+// UPDATE STATUS
 
 app.put("/api/appointments/:id", async (req, res) => {
 
@@ -140,39 +134,21 @@ if (status === "Completed") {
 
 await transporter.sendMail({
 
-from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
+from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 to: appointment.email,
 
-subject: "Appointment Confirmed - Smile Dental Clinic",
+subject: "Appointment Confirmed - Smile Dental",
 
 html: `
-<div style="font-family:Arial;background:#f5f7fb;padding:30px">
+<h2>Appointment Confirmed</h2>
 
-<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
+<p>Hello ${appointment.name}</p>
 
-<h2 style="color:#2a6edb">Smile Dental Clinic</h2>
+<p>Date: ${appointment.date}</p>
+<p>Time: ${appointment.time}</p>
+<p>Service: ${appointment.service}</p>
 
-<p>Hello <b>${appointment.name}</b>,</p>
-
-<p>Your appointment has been successfully booked. Here are your details:</p>
-
-<div style="background:#f1f3f6;padding:15px;border-radius:6px">
-
-<p><b>Date:</b> ${appointment.date}</p>
-<p><b>Time:</b> ${appointment.time}</p>
-<p><b>Service:</b> ${appointment.service}</p>
-
-</div>
-
-<p>
-<b>Smile Dental Clinic</b><br/>
-📞 +91 8467093427 <br/>
-✉ smiledentalofficial0@gmail.com
-</p>
-
-</div>
-
-</div>
+<p>Thank you for choosing Smile Dental</p>
 `
 
 });
@@ -188,39 +164,17 @@ if (status === "Rejected") {
 
 await transporter.sendMail({
 
-from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
+from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
 to: appointment.email,
 
-subject: "Appointment Rejected - Smile Dental Clinic",
+subject: "Appointment Rejected - Smile Dental",
 
 html: `
-<div style="font-family:Arial;background:#f5f7fb;padding:30px">
+<h2>Appointment Rejected</h2>
 
-<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
+<p>Hello ${appointment.name}</p>
 
-<h2 style="color:#ff4d4d">Smile Dental Clinic</h2>
-
-<p>Hello <b>${appointment.name}</b>,</p>
-
-<p>Unfortunately your appointment has been rejected.</p>
-
-<div style="background:#f1f3f6;padding:15px;border-radius:6px">
-
-<p><b>Date:</b> ${appointment.date}</p>
-<p><b>Time:</b> ${appointment.time}</p>
-<p><b>Service:</b> ${appointment.service}</p>
-
-</div>
-
-<p>
-<b>Smile Dental Clinic</b><br/>
-📞 +91 8467093427 <br/>
-✉ smiledentalofficial0@gmail.com
-</p>
-
-</div>
-
-</div>
+<p>Please book another slot</p>
 `
 
 });
@@ -244,7 +198,7 @@ message: "Error"
 });
 
 
-// ================= GET =================
+// GET
 
 app.get("/api/appointments", async (req, res) => {
 
@@ -257,7 +211,7 @@ res.json(data);
 });
 
 
-// ================= DELETE =================
+// DELETE
 
 app.delete("/api/appointments/:id", async (req, res) => {
 
