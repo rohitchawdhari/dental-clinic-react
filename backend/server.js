@@ -15,12 +15,10 @@ app.use(cors());
 app.use(express.json());
 
 
-// EMAIL SETUP (FIXED FOR RENDER)
+// EMAIL SETUP
 
 const transporter = nodemailer.createTransport({
-host: "smtp.gmail.com",
-port: 587,
-secure: false,
+service: "gmail",
 auth: {
 user: process.env.EMAIL_USER,
 pass: process.env.EMAIL_PASS,
@@ -44,14 +42,12 @@ mongoose
 app.use("/api/reviews", reviewRoutes);
 
 
-// HOME ROUTE
-
 app.get("/", (req, res) => {
 res.send("Dental Backend Running");
 });
 
 
-// CREATE APPOINTMENT
+// ================= CREATE APPOINTMENT =================
 
 app.post("/api/appointments", async (req, res) => {
 
@@ -72,14 +68,9 @@ status: "Pending"
 await appointment.save();
 
 
-// RESPONSE FIRST
+// CLINIC MAIL
 
-res.json({ success: true });
-
-
-// MAIL BACKGROUND
-
-transporter.sendMail({
+await transporter.sendMail({
 
 from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
 to: process.env.EMAIL_USER,
@@ -109,15 +100,15 @@ html: `
 </div>
 `
 
-}).then(() => {
-console.log("Booking mail sent");
-}).catch(err => {
-console.log("Booking Mail Error:", err);
 });
+
+console.log("Booking mail sent");
+
+return res.json({ success: true });
 
 } catch (error) {
 
-console.log("Booking Error:", error);
+console.log("Booking Mail Error:", error);
 
 return res.status(500).json({
 message: "Error"
@@ -128,7 +119,7 @@ message: "Error"
 });
 
 
-// UPDATE STATUS
+// ================= UPDATE STATUS =================
 
 app.put("/api/appointments/:id", async (req, res) => {
 
@@ -142,14 +133,12 @@ req.params.id,
 { new: true }
 );
 
-res.json(appointment);
-
 
 // APPROVE
 
 if (status === "Completed") {
 
-transporter.sendMail({
+await transporter.sendMail({
 
 from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
 to: appointment.email,
@@ -186,11 +175,9 @@ html: `
 </div>
 `
 
-}).then(() => {
-console.log("Approve mail sent");
-}).catch(err => {
-console.log("Approve Mail Error:", err);
 });
+
+console.log("Approve mail sent");
 
 }
 
@@ -199,7 +186,7 @@ console.log("Approve Mail Error:", err);
 
 if (status === "Rejected") {
 
-transporter.sendMail({
+await transporter.sendMail({
 
 from: `"Smile Dental Clinic" <${process.env.EMAIL_USER}>`,
 to: appointment.email,
@@ -236,13 +223,13 @@ html: `
 </div>
 `
 
-}).then(() => {
-console.log("Reject mail sent");
-}).catch(err => {
-console.log("Reject Mail Error:", err);
 });
 
+console.log("Reject mail sent");
+
 }
+
+return res.json(appointment);
 
 } catch (error) {
 
@@ -257,7 +244,7 @@ message: "Error"
 });
 
 
-// GET APPOINTMENTS
+// ================= GET =================
 
 app.get("/api/appointments", async (req, res) => {
 
@@ -270,7 +257,7 @@ res.json(data);
 });
 
 
-// DELETE
+// ================= DELETE =================
 
 app.delete("/api/appointments/:id", async (req, res) => {
 
