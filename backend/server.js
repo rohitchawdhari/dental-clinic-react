@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 
-// EMAIL SETUP (FIXED FOR RENDER)
+// EMAIL SETUP
 
 const transporter = nodemailer.createTransport({
 host: "smtp.gmail.com",
@@ -46,7 +46,7 @@ res.send("Dental Backend Running");
 });
 
 
-// CREATE APPOINTMENT
+// ================= CREATE APPOINTMENT =================
 
 app.post("/api/appointments", async (req, res) => {
 
@@ -66,6 +66,11 @@ status: "Pending"
 
 await appointment.save();
 
+// success first
+res.json({ success: true });
+
+try {
+
 await transporter.sendMail({
 
 from: `"Smile Dental" <${process.env.EMAIL_USER}>`,
@@ -74,10 +79,11 @@ to: "smiledentalofficial0@gmail.com",
 subject: `New Appointment - ${name}`,
 
 html: `
-<div style="font-family: Arial; padding:20px; background:#f4f4f4">
-<div style="background:white; padding:20px; border-radius:8px">
+<div style="font-family:Arial;background:#f5f7fb;padding:30px">
 
-<h2 style="color:#2563eb">New Appointment Received</h2>
+<div style="max-width:600px;margin:auto;background:white;padding:25px;border-radius:8px">
+
+<h2 style="color:#2a6edb">New Appointment Received</h2>
 
 <p><b>Patient Name:</b> ${name}</p>
 <p><b>Phone Number:</b> ${phone}</p>
@@ -88,9 +94,10 @@ html: `
 
 <hr/>
 
-<p>Smile Dental Clinic</p>
+<p>Please contact the patient for confirmation.</p>
 
 </div>
+
 </div>
 `
 
@@ -98,11 +105,15 @@ html: `
 
 console.log("Booking mail sent");
 
-return res.json({ success: true });
+} catch (mailError) {
+
+console.log("Booking Mail Error:", mailError);
+
+}
 
 } catch (error) {
 
-console.log("Booking Mail Error:", error);
+console.log("Booking Error:", error);
 
 return res.status(500).json({
 message: "Error"
@@ -113,7 +124,7 @@ message: "Error"
 });
 
 
-// UPDATE STATUS
+// ================= UPDATE STATUS =================
 
 app.put("/api/appointments/:id", async (req, res) => {
 
@@ -131,6 +142,8 @@ req.params.id,
 // APPROVE
 
 if (status === "Completed") {
+
+try {
 
 await transporter.sendMail({
 
@@ -155,12 +168,20 @@ html: `
 
 console.log("Approve mail sent");
 
+} catch (mailError) {
+
+console.log("Approve Mail Error:", mailError);
+
+}
+
 }
 
 
 // REJECT
 
 if (status === "Rejected") {
+
+try {
 
 await transporter.sendMail({
 
@@ -181,6 +202,12 @@ html: `
 
 console.log("Reject mail sent");
 
+} catch (mailError) {
+
+console.log("Reject Mail Error:", mailError);
+
+}
+
 }
 
 return res.json(appointment);
@@ -198,7 +225,7 @@ message: "Error"
 });
 
 
-// GET
+// ================= GET =================
 
 app.get("/api/appointments", async (req, res) => {
 
@@ -211,7 +238,7 @@ res.json(data);
 });
 
 
-// DELETE
+// ================= DELETE =================
 
 app.delete("/api/appointments/:id", async (req, res) => {
 
