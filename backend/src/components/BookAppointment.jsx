@@ -7,12 +7,7 @@ import { FaChevronRight } from "react-icons/fa";
 
 const BookAppointment = () => {
 
-// AUTO API SWITCH (LOCAL + LIVE)
-
-const API_URL =
-window.location.hostname === "localhost"
-? "http://localhost:5000"
-: "https://smile-dental-backend.onrender.com";
+const API_URL = "https://smile-dental-backend.onrender.com";
 
 const [activeStep, setActiveStep] = useState(1);
 const [loading, setLoading] = useState(false);
